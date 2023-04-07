@@ -69,7 +69,7 @@ class PetParamView(APIView):
         serializer.is_valid(raise_exception=True)
 
         group_data = serializer.validated_data.pop("group", None)
-        print(group_data)
+
         traits_data = serializer.validated_data.pop("traits", None)
 
         if group_data:
@@ -83,9 +83,7 @@ class PetParamView(APIView):
             list_traits = []
 
             for trait in traits_data:
-                trait_obj = Trait.objects.filter(
-                    name__iexact=trait["name"]
-                ).first()
+                trait_obj = Trait.objects.filter(name__iexact=trait["name"]).first()
 
                 if not trait_obj:
                     trait_obj = Trait.objects.create(**trait)
