@@ -9,7 +9,6 @@ from django.shortcuts import get_object_or_404
 
 
 class PetView(APIView, PageNumberPagination):
-
     def post(self, request):
         serializer = PetSerializer(data=request.data)
 
@@ -46,8 +45,12 @@ class PetView(APIView, PageNumberPagination):
 
         trait_name = request.query_params.get("trait", None)
 
-        traits = Trait.objects.filter(name=trait_name).first()
-        pets = Pet.objects.filter(traits=traits).all()
+        if not trait_name:
+            result_page = self.paginate_queryset(pets, request, view=self)
+            serializer = PetSerializer(result_page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        pets = Pet.objects.filter(traits__name=trait_name).all()
 
         result_page = self.paginate_queryset(pets, request, view=self)
         serializer = PetSerializer(result_page, many=True)
